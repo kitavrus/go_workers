@@ -58,7 +58,6 @@ func sumch(inch <-chan int) chan int {
 	}()
 
 	return chw
-
 }
 
 func generator(max int) chan int {
