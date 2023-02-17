@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	generator "ep24/internal"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 
 	maxGen := 100
 	maxWorkers := 2
-	gench := generator(maxGen)
+	gench := generator.New(maxGen)
 	sumch := make(chan int)
 	var wg sync.WaitGroup
 
@@ -44,28 +45,14 @@ func main() {
 }
 
 func worker(inCh <-chan int, outCh chan<- int, wg *sync.WaitGroup, i int) {
+	defer wg.Done()
+
 	var sum int
-	fmt.Println("start worker: ", i)
+	fmt.Println("start worker: ", i+1)
 
 	for v := range inCh {
 		sum += v
 	}
-
 	outCh <- sum
-	wg.Done()
-	fmt.Printf("end worker: %d sum: %d \n", i, sum)
-}
-
-func generator(max int) <-chan int {
-	ch := make(chan int)
-	go func() {
-		defer close(ch)
-		for i := 0; i < max; i++ {
-			ch <- 1
-			time.Sleep(1 * time.Millisecond)
-		}
-
-	}()
-
-	return ch
+	fmt.Printf("end worker: %d sum: %d \n", i+1, sum)
 }
